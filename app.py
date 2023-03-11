@@ -16,11 +16,11 @@ client_pass = os.environ['client_secret']
 # Call spotify
 spotify = Spotify(client_id, client_pass)
 # Call discogs
-discogs = discogs_client.Client('my_user_agent/1.0', user_token='dEtgKPduASaiXftmQpaNuxMEBVySnUwZvxPlJPgQ')
+discogs = discogs_client.Client('my_user_agent/1.0', user_token=os.environ['user_token'])
 
 # define the Twilio API credentials and the target phone number
-account_sid = 'ACc87e68f855dc603c3cbe439347d1a1ba'
-auth_token = '6291681b5b8f6ff992d24daa8c27c1e6'
+account_sid = os.environ['account_sid']
+auth_token = os.environ['auth_token']
 whatsapp_number = 'whatsapp:+14155238886'
 target_number = 'whatsapp:+972547404734'  # replace with the phone number you want to send the message to
 
@@ -106,7 +106,7 @@ def send_a_message(results):
 
     for discogs_url, image_url, lowest_price in results:
         images = []
-        msg = message_text + " " + discogs_url + " " + "\n" + "Price Start With " + str(lowest_price)
+        msg = f"{message_text}: {discogs_url}. \n Price Start With: {str(lowest_price)} $"
         if image_url:
             images.append(image_url)
         else:
