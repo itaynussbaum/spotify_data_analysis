@@ -18,10 +18,20 @@ spotify = Spotify(client_id, client_pass)
 # Call discogs
 discogs = discogs_client.Client('my_user_agent/1.0', user_token='dEtgKPduASaiXftmQpaNuxMEBVySnUwZvxPlJPgQ')
 
+# define the Twilio API credentials and the target phone number
+account_sid = 'ACc87e68f855dc603c3cbe439347d1a1ba'
+auth_token = '6291681b5b8f6ff992d24daa8c27c1e6'
+whatsapp_number = 'whatsapp:+14155238886'
+target_number = 'whatsapp:+972547404734'  # replace with the phone number you want to send the message to
 
-# get the user's top tracks
-top_tracks = spotify.get_top_tracks()
-tracks = top_tracks['items']
+# create a Twilio API client
+client = Client(account_sid, auth_token)
+
+
+def get_user_tracks():
+    top_tracks = spotify.get_top_tracks()
+    top_tracks = top_tracks['items']
+    return top_tracks
 
 
 def get_master_ids(tracks):
@@ -71,52 +81,51 @@ def get_discogs_info(master_ids):
     return results
 
 
+def validator(results):
+    for discogs_url, image_url, lowest_price in results:
+        print(f"Discogs URL: {discogs_url}")
+        if image_url:
+            print(f"Image URL: {image_url}")
+        else:
+            print("No image available.")
+        if lowest_price:
+            print(f"Lowest Price: {lowest_price}")
+        else:
+            print("No price available.")
+
+
+def send_a_message(results):
+    # define the master release IDs and the message text
+    message_text = "Some cool records you should check!"
+
+    # create a Twilio MessagingResponse object and add the message text
+    twiml = MessagingResponse()
+    twiml.message(message_text)
+
+    # add a Media message for each album in the results list
+
+    for discogs_url, image_url, lowest_price in results:
+        images = []
+        msg = message_text + " " + discogs_url + " " + "\n" + "Price Start With " + str(lowest_price)
+        if image_url:
+            images.append(image_url)
+        else:
+            pass
+
+        # send the message via the Twilio API
+        message = client.messages.create(
+            media_url=images,
+            body=msg,
+            from_=whatsapp_number,
+            to=target_number,
+            # status_callback='https://yourapp.com/status_callback'
+        )
+
+        print(f"Message sent! SID: {message.sid}")
+
+
+tracks = get_user_tracks()
 master_ids = get_master_ids(tracks)
 results = get_discogs_info(master_ids)
-
-for discogs_url, image_url, lowest_price in results:
-    print(f"Discogs URL: {discogs_url}")
-    if image_url:
-        print(f"Image URL: {image_url}")
-    else:
-        print("No image available.")
-    if lowest_price:
-        print(f"Lowest Price: {lowest_price}")
-    else:
-        print("No price available.")
-
-# define the Twilio API credentials and the target phone number
-account_sid = 'ACc87e68f855dc603c3cbe439347d1a1ba'
-auth_token = '6291681b5b8f6ff992d24daa8c27c1e6'
-whatsapp_number = 'whatsapp:+14155238886'
-target_number = 'whatsapp:+972547404734'  # replace with the phone number you want to send the message to
-
-# create a Twilio API client
-client = Client(account_sid, auth_token)
-
-# define the master release IDs and the message text
-message_text = "Some cool records you should check!"
-
-# create a Twilio MessagingResponse object and add the message text
-twiml = MessagingResponse()
-twiml.message(message_text)
-
-# add a Media message for each album in the results list
-for discogs_url, image_url, lowest_price in results:
-    images = []
-    msg = message_text + " " + discogs_url + " " + "\n" + "Price Start With " + str(lowest_price)
-    if image_url:
-        images.append(image_url)
-    else:
-        pass
-
-    # send the message via the Twilio API
-    message = client.messages.create(
-        media_url=images,
-        body=msg,
-        from_=whatsapp_number,
-        to=target_number,
-        # status_callback='https://yourapp.com/status_callback'
-    )
-
-    print(f"Message sent! SID: {message.sid}")
+validator(results)
+send_a_message(results)
