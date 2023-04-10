@@ -2,9 +2,10 @@ const clientId = "7fe6675024d54a34b4fbe8df31280d5d";
 const params = new URLSearchParams(window.location.search);
 const code = params.get("code");
 
-if (!code) {
+async function main() {
+  if (!code) {
     redirectToAuthCodeFlow(clientId);
-} else {
+  } else {
     const accessToken = await getAccessToken(clientId, code);
     const profile = await fetchProfile(accessToken);
     populateUI(profile);
@@ -12,7 +13,11 @@ if (!code) {
     displayTopSongs(topSongs);
     const recommendations = await fetchVinylRecommendations(accessToken);
     displayVinylRecommendations(recommendations);
+  }
 }
+
+main();
+
 
 // TODO: Redirect to Spotify authorization page
 export async function redirectToAuthCodeFlow(clientId) {
