@@ -24,10 +24,9 @@ def vinyl_recommendations():
     logging.info(f"Results: {results}")
     return jsonify(results)
 
-@app2.route("/", methods=["GET"])
-def serve_index():
+@app2.route("/callback", methods=["GET"])
+def handle_callback():
     return send_from_directory(app2.static_folder, "index.html")
-
 @app2.route("/static/<path:path>", methods=["GET"])
 def serve_static(path):
     return send_from_directory(app2.static_folder, path)
