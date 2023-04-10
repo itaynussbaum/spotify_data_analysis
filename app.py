@@ -1,60 +1,56 @@
 import os
-import re
-import json
 import discogs_client
-import spotipy
-import pandas as pd
-from discogs import Discogs
+import logging
 from spotify import Spotify
 from twilio.rest import Client
 from twilio.twiml.messaging_response import MessagingResponse
+from dotenv import load_dotenv
+load_dotenv()
 
-# Spotify credentials
-client_id = os.environ['client_id']
-client_pass = os.environ['client_secret']
+# Set up logging
+logging.basicConfig(level=logging.INFO)
 
-# Call spotify
-spotify = Spotify(client_id, client_pass)
-# Call discogs
-discogs = discogs_client.Client('my_user_agent/1.0', user_token=os.environ['user_token'])
-
-# define the Twilio API credentials and the target phone number
-account_sid = os.environ['account_sid']
-auth_token = os.environ['auth_token']
+# Get credentials from environment variables
+client_id = os.environ['SPOTIFY_CLIENT_ID']
+client_pass = os.environ['SPOTIFY_CLIENT_SECRET']
+account_sid = os.environ['TWILIO_ACCOUNT_SID']
+auth_token = os.environ['TWILIO_AUTH_TOKEN']
 whatsapp_number = 'whatsapp:+14155238886'
 target_number = 'whatsapp:+972547404734'  # replace with the phone number you want to send the message to
 
-# create a Twilio API client
+# Initialize APIs
+spotify = Spotify(client_id, client_pass)
+discogs = discogs_client.Client('my_user_agent/1.0', user_token=os.environ['DISCOGS_USER_TOKEN'])
 client = Client(account_sid, auth_token)
 
 
 def get_user_tracks():
+    """Get the user's top tracks from Spotify."""
     top_tracks = spotify.get_top_tracks()
-    top_tracks = top_tracks['items']
-    return top_tracks
+    return top_tracks['items']
 
+def get_user_recently_played():
+    """Get the user's recently played tracks from Spotify."""
+    recently_played = spotify.current_user_recently_played()
+    return recently_played
 
 def get_master_ids(tracks):
-    # create a Discogs API client
+    """Get the master release IDs for the given tracks from Discogs."""
     master_ids = []
+
     for track in tracks:
-        print(track['album']['name'] + " - " + track['name'])
+        logging.info(f"Getting master release for track: {track['album']['name']} - {track['name']}")
 
         # search Discogs for the master release
-        master_search_results = discogs.search(track['album']['name'] + " " + track['name'], type='master')
+        master_search_results = discogs.search(track['album']['name'] + " " + track['name'], type='master').page(1)
 
-        # get the first page of search results
-        page = master_search_results.page(1)
-
-        if page:
-            # get the first item in the page
-            item = page[0]
+        if master_search_results:
             # extract the master ID from the item
-            master_id = item.id
+            master_id = master_search_results[0].id
             master_ids.append(master_id)
-            print(f"Master ID: {master_id}")
+            logging.info(f"Found master release: {master_id}")
         else:
-            print("No results found for page 1.")
+            logging.error("No results found for page 1.")
 
     return master_ids
 
@@ -63,35 +59,38 @@ def get_discogs_info(master_ids):
     results = []
 
     for master_id in master_ids:
-        # get the master release object
-        master_release = discogs.master(master_id)
+        try:
+            # Get the master release object
+            master_release = discogs.master(master_id)
 
-        # get the Discogs URL for the master release
-        discogs_url = master_release.url
+            # Get the Discogs URL for the master release
+            discogs_url = master_release.url
 
-        # Find the version with the lowest price
-        lowest_price = master_release.data["lowest_price"]
-        # get the URL of the first image in the master release's images list
-        image_url = None
-        if len(master_release.images) > 0:
-            image_url = master_release.images[0]['uri']
-
-        results.append([discogs_url, image_url, lowest_price])
+            # Find the version with the lowest price
+            lowest_price = master_release.data["lowest_price"]
+            # get the URL of the first image in the master release's images list
+            image_url = None
+            if len(master_release.images) > 0:
+                image_url = master_release.images[0]['uri']
+            results.append([discogs_url, image_url, lowest_price])
+        except:
+            logging.error(f"Could not get Discogs info for master release ID {master_id}")
+            continue
 
     return results
 
 
 def validator(results):
     for discogs_url, image_url, lowest_price in results:
-        print(f"Discogs URL: {discogs_url}")
+        logging.info(f"Discogs URL: {discogs_url}")
         if image_url:
-            print(f"Image URL: {image_url}")
+            logging.info(f"Image URL: {image_url}")
         else:
-            print("No image available.")
+            logging.error("No image available.")
         if lowest_price:
-            print(f"Lowest Price: {lowest_price}")
+            logging.info(f"Lowest Price: {lowest_price}")
         else:
-            print("No price available.")
+            logging.error("No price available.")
 
 
 def send_a_message(results):
@@ -121,11 +120,18 @@ def send_a_message(results):
             # status_callback='https://yourapp.com/status_callback'
         )
 
-        print(f"Message sent! SID: {message.sid}")
+        logging.info(f"Message sent! SID: {message.sid}")
+def get_credentials():
+    return client_id, client_pass
+
+def main():
+    tracks = get_user_tracks()
+    recently_played = get_user_recently_played()
+    master_ids = get_master_ids(tracks)
+    results = get_discogs_info(master_ids)
+    validator(results)
+    send_a_message(results)
 
 
-tracks = get_user_tracks()
-master_ids = get_master_ids(tracks)
-results = get_discogs_info(master_ids)
-validator(results)
-send_a_message(results)
+if __name__ == "__main__":
+    main()

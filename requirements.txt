@@ -1,0 +1,6 @@
+Flask
+flask-cors
+requests
+discogs_client
+python-dotenv
+gunicorn
