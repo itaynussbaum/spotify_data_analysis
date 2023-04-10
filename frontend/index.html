@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>My Spotify Profile</title>
+  <script src="src/script.js" type="module"></script>
+  <link rel="stylesheet" href="style.css">
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      line-height: 1.6;
+      margin: 0;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      background-color: #f2f2f2;
+    }
+
+    .profile-container {
+      background-color: #fff;
+      padding: 50px;
+      border-radius: 10px;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+      max-width: 800px;
+    }
+
+    h1, h2 {
+      color: #333;
+    }
+
+    ul {
+      list-style: none;
+      padding: 0;
+    }
+
+    li {
+      margin-bottom: 10px;
+    }
+
+    a {
+      color: #1DB954;
+      text-decoration: none;
+    }
+
+    a:hover {
+      text-decoration: underline;
+    }
+
+    #avatar {
+      display: inline-block;
+      margin-bottom: 10px;
+    }
+
+    img {
+      border-radius: 50%;
+    }
+
+    .top-songs-table {
+      border-collapse: collapse;
+      width: 100%;
+      font-family: Arial, sans-serif;
+    }
+
+    .top-songs-table th,
+    .top-songs-table td {
+      border: 1px solid #ddd;
+      padding: 8px;
+      text-align: left;
+    }
+
+    .top-songs-table th {
+      background-color: #f2f2f2;
+      font-weight: bold;
+    }
+
+    .top-songs-table tr:nth-child(even) {
+      background-color: #f2f2f2;
+    }
+
+    .top-songs-table tr:hover {
+      background-color: #ddd;
+    }
+  </style>
+</head>
+<body>
+<div class="profile-container">
+  <h1>Display your Spotify profile data</h1>
+  <section id="profile">
+    <h2>Logged in as <span id="displayName"></span></h2>
+    <span id="avatar"></span>
+    <ul>
+      <li>User ID: <span id="id"></span></li>
+      <li>Email: <span id="email"></span></li>
+      <li>Spotify URI: <a id="uri" href="#"></a></li>
+      <li>Profile Image: <span id="imgUrl"></span></li>
+      <li>Vinyl Recommendations:</li>
+    </ul>
+    <div id="vinylRecommendationsContainer"></div>
+    </ul>
+    <li>Top Songs:</li>
+    </ul>
+    <div id="topSongsContainer"></div>
+  </section>
+</div>
+</body>
+</html>
