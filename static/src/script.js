@@ -168,19 +168,6 @@ function displayVinylRecommendations(recommendations) {
     container.appendChild(recommendationsContainer);
 }
 
-
-document.addEventListener("DOMContentLoaded", () => {
-    fetchVinylRecommendations()
-        .then(recommendations => {
-            // Process the recommendations here
-            console.log(recommendations);
-        })
-        .catch(error => {
-            console.error("Error fetching vinyl recommendations:", error);
-        });
-});
-
-
 function populateUI(profile) {
     document.getElementById("displayName").innerText = profile.display_name;
     if (profile.images[0]) {
