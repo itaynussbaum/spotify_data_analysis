@@ -81,92 +81,92 @@ async function fetchProfile(token) {
 
 
 }
-async function fetchTopSongs(token) {
-    const result = await fetch("https://api.spotify.com/v1/me/top/tracks", {
-        method: "GET",
-        headers: { Authorization: `Bearer ${token}` },
-    });
-
-    return await result.json();
-}
-function displayTopSongs(topSongs) {
-    const container = document.getElementById("topSongsContainer");
-    const table = document.createElement("table");
-    table.classList.add("top-songs-table");
-
-    const headerRow = document.createElement("tr");
-    ["Track Name", "Artist"].forEach((headerText) => {
-        const headerCell = document.createElement("th");
-        headerCell.innerText = headerText;
-        headerRow.appendChild(headerCell);
-    });
-    table.appendChild(headerRow);
-
-    topSongs.items.forEach((song) => {
-        const row = document.createElement("tr");
-
-        const trackNameCell = document.createElement("td");
-        trackNameCell.innerText = song.name;
-        row.appendChild(trackNameCell);
-
-        const artistNameCell = document.createElement("td");
-        artistNameCell.innerText = song.artists[0].name;
-        row.appendChild(artistNameCell);
-
-        table.appendChild(row);
-    });
-
-    container.appendChild(table);
-}
-async function fetchVinylRecommendations(token) {
-    console.log('fetchVinylRecommendations called');
-    const response = await fetch("https://spot-vinyl.herokuapp.com/api/vinyl-recommendations", {
-        method: "GET",
-        headers: {
-            'Content-Type': 'application/json',
-            'Authorization': `Bearer ${token}`
-        },
-    });
-    const recommendations = await response.json();
-    console.log('Received recommendations:', recommendations);
-    return recommendations; // Return the recommendations
-}
-function displayVinylRecommendations(recommendations) {
-    const container = document.getElementById("vinylRecommendationsContainer");
-
-    const recommendationsContainer = document.createElement("div");
-    recommendationsContainer.classList.add("recommendations-container");
-
-    recommendations.forEach((recommendation) => {
-        const discogsUrl = recommendation[0];
-        const imageUrl = recommendation[1];
-        const lowestPrice = recommendation[2];
-
-        const vinylElement = document.createElement("div");
-        vinylElement.classList.add("vinyl-recommendation");
-
-        const imageElement = document.createElement("img");
-        imageElement.src = imageUrl;
-        vinylElement.appendChild(imageElement);
-
-        const infoElement = document.createElement("div");
-        infoElement.classList.add("vinyl-info");
-        const priceElement = document.createElement("p");
-        priceElement.innerText = `Lowest: $${lowestPrice.toFixed(2)}`;
-        infoElement.appendChild(priceElement);
-        const discogsLink = document.createElement("a");
-        discogsLink.href = discogsUrl;
-        discogsLink.innerText = "Discogs";
-        infoElement.appendChild(discogsLink);
-
-
-
-        vinylElement.appendChild(infoElement);
-        recommendationsContainer.appendChild(vinylElement);
-    });
-
-    container.appendChild(recommendationsContainer);
-}
+// async function fetchTopSongs(token) {
+//     const result = await fetch("https://api.spotify.com/v1/me/top/tracks", {
+//         method: "GET",
+//         headers: { Authorization: `Bearer ${token}` },
+//     });
+//
+//     return await result.json();
+// }
+// function displayTopSongs(topSongs) {
+//     const container = document.getElementById("topSongsContainer");
+//     const table = document.createElement("table");
+//     table.classList.add("top-songs-table");
+//
+//     const headerRow = document.createElement("tr");
+//     ["Track Name", "Artist"].forEach((headerText) => {
+//         const headerCell = document.createElement("th");
+//         headerCell.innerText = headerText;
+//         headerRow.appendChild(headerCell);
+//     });
+//     table.appendChild(headerRow);
+//
+//     topSongs.items.forEach((song) => {
+//         const row = document.createElement("tr");
+//
+//         const trackNameCell = document.createElement("td");
+//         trackNameCell.innerText = song.name;
+//         row.appendChild(trackNameCell);
+//
+//         const artistNameCell = document.createElement("td");
+//         artistNameCell.innerText = song.artists[0].name;
+//         row.appendChild(artistNameCell);
+//
+//         table.appendChild(row);
+//     });
+//
+//     container.appendChild(table);
+// }
+// async function fetchVinylRecommendations(token) {
+//     console.log('fetchVinylRecommendations called');
+//     const response = await fetch("https://spot-vinyl.herokuapp.com/api/vinyl-recommendations", {
+//         method: "GET",
+//         headers: {
+//             'Content-Type': 'application/json',
+//             'Authorization': `Bearer ${token}`
+//         },
+//     });
+//     const recommendations = await response.json();
+//     console.log('Received recommendations:', recommendations);
+//     return recommendations; // Return the recommendations
+// }
+// function displayVinylRecommendations(recommendations) {
+//     const container = document.getElementById("vinylRecommendationsContainer");
+//
+//     const recommendationsContainer = document.createElement("div");
+//     recommendationsContainer.classList.add("recommendations-container");
+//
+//     recommendations.forEach((recommendation) => {
+//         const discogsUrl = recommendation[0];
+//         const imageUrl = recommendation[1];
+//         const lowestPrice = recommendation[2];
+//
+//         const vinylElement = document.createElement("div");
+//         vinylElement.classList.add("vinyl-recommendation");
+//
+//         const imageElement = document.createElement("img");
+//         imageElement.src = imageUrl;
+//         vinylElement.appendChild(imageElement);
+//
+//         const infoElement = document.createElement("div");
+//         infoElement.classList.add("vinyl-info");
+//         const priceElement = document.createElement("p");
+//         priceElement.innerText = `Lowest: $${lowestPrice.toFixed(2)}`;
+//         infoElement.appendChild(priceElement);
+//         const discogsLink = document.createElement("a");
+//         discogsLink.href = discogsUrl;
+//         discogsLink.innerText = "Discogs";
+//         infoElement.appendChild(discogsLink);
+//
+//
+//
+//         vinylElement.appendChild(infoElement);
+//         recommendationsContainer.appendChild(vinylElement);
+//     });
+//
+//     container.appendChild(recommendationsContainer);
+// }
 
 function populateUI(profile) {
     document.getElementById("displayName").innerText = profile.display_name;

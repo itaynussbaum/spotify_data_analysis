@@ -13,6 +13,9 @@ spotify = Spotify(client_id, client_pass)
 app2 = Flask(__name__,static_folder="static")
 CORS(app2)
 
+@app2.route("/callback", methods=["GET"])
+def handle_callback():
+    return send_from_directory(app2.static_folder, "index.html")
 @app2.route("/api/vinyl-recommendations", methods=["GET"])
 def vinyl_recommendations():
     logging.info("vinyl_recommendations function called")
@@ -24,9 +27,6 @@ def vinyl_recommendations():
     logging.info(f"Results: {results}")
     return jsonify(results)
 
-@app2.route("/", methods=["GET"])
-def handle_callback():
-    return send_from_directory(app2.static_folder, "index.html")
 @app2.route("/static/<path:path>", methods=["GET"])
 def serve_static(path):
     return send_from_directory(app2.static_folder, path)
