@@ -26,10 +26,11 @@ def vinyl_recommendations():
 
 @app2.route("/callback", methods=["GET"])
 def handle_callback():
-    return send_from_directory(app2.static, "index.html")
+    logging.debug("handle_callback called")
+    return send_from_directory(app2.static_folder, "index.html")
 @app2.route("/static/<path:path>", methods=["GET"])
 def serve_static(path):
-    return send_from_directory(app2.static, path)
+    return send_from_directory(app2.static_folder, path)
 
 # ...
 if __name__ == "__main__":
